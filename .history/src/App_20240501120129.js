@@ -48,48 +48,19 @@ function Item({ item: { id, description, quantity, packed }, onDeleteItem, onChe
   </li>
 }
 
-function PackagingList({ items, onDeleteItem, onCheckItem, onClearList }) {
-  const [sortBy, setSortBy] = useState("input");
-
-  const sortedItems = items.slice().sort((a, b) => {
-    if (sortBy === "input") {
-      return a.id - b.id;
-    }
-    if (sortBy === "description") {
-      return a.description.localeCompare(b.description);
-    }
-    if (sortBy === "packed") {
-      return Number(b.packed) - Number(a.packed)
-    }
-    return 0;
-  });
-
-  return (
-    <div className="list">
-      <ul>{
-        sortedItems.map(item => <Item key={item.id} item={item} onDeleteItem={onDeleteItem} onCheckItem={onCheckItem}/>)
-      }</ul>
-      <div className="actions">
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-          <option value="input">input</option>
-          <option value="description">description</option>
-          <option value="packed">packed</option>
-        </select>
-      </div>
-      <button onClick={onClearList}>Clear list</button>
-    </div>
-  )
+function PackagingList({ items, onDeleteItem, onCheckItem }) {
+  return <div className="list">
+    <ul>{
+      items.map(item => <Item key={item.id} item={item} onDeleteItem={onDeleteItem} onCheckItem={onCheckItem}/>)
+    }</ul>
+  </div>
 }
 
-function Stats({ items }) {
-  const numItems = items.length;
-  const numPacked = items.filter((item) => item.packed).length;
-  const percentage = Math.round((numPacked / numItems) * 100);
-
+function Stats() {
   return (
     <footer className="stats">
       <em>
-        You have {numItems} items on your list and you already packed {numPacked} ({percentage}%)
+        You have X items on your list and you already packed X (X%)
       </em>
     </footer>
   )
@@ -108,21 +79,20 @@ function App() {
 
   const handleCheckItem = (id) => {
     const updatedItems = items.map((item) => {
-      return (item.id === id) ? { ...item, packed: !item.packed } : item;
+      return (item.id === id) ?
+        { ...item, packed: !item.packed };
+      :
+      item;
     });
     setItems(updatedItems);
-  }
-
-  const handleDeleteList = () => {
-    setItems([]);
   }
 
   return (
     <div className="app">
       <Logo />
       <Form onAddItems={handleAddItems}/>
-      <PackagingList items={items} onDeleteItem={handleDeleteItem} onCheckItem={handleCheckItem} onClearList={handleDeleteList}/>
-      <Stats items={items}/>
+      <PackagingList items={items} onDeleteItem={handleDeleteItem} onCheckItem={handleCheckItem}/>
+      <Stats />
     </div>
   );
 }

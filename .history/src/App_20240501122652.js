@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './index.css';
 
 const initialItems = [
@@ -48,7 +48,7 @@ function Item({ item: { id, description, quantity, packed }, onDeleteItem, onChe
   </li>
 }
 
-function PackagingList({ items, onDeleteItem, onCheckItem, onClearList }) {
+function PackagingList({ items, onDeleteItem, onCheckItem }) {
   const [sortBy, setSortBy] = useState("input");
 
   const sortedItems = items.slice().sort((a, b) => {
@@ -59,7 +59,7 @@ function PackagingList({ items, onDeleteItem, onCheckItem, onClearList }) {
       return a.description.localeCompare(b.description);
     }
     if (sortBy === "packed") {
-      return Number(b.packed) - Number(a.packed)
+      return Number(a.packed) - Number(b.packed)
     }
     return 0;
   });
@@ -76,7 +76,6 @@ function PackagingList({ items, onDeleteItem, onCheckItem, onClearList }) {
           <option value="packed">packed</option>
         </select>
       </div>
-      <button onClick={onClearList}>Clear list</button>
     </div>
   )
 }
@@ -113,15 +112,11 @@ function App() {
     setItems(updatedItems);
   }
 
-  const handleDeleteList = () => {
-    setItems([]);
-  }
-
   return (
     <div className="app">
       <Logo />
       <Form onAddItems={handleAddItems}/>
-      <PackagingList items={items} onDeleteItem={handleDeleteItem} onCheckItem={handleCheckItem} onClearList={handleDeleteList}/>
+      <PackagingList items={items} onDeleteItem={handleDeleteItem} onCheckItem={handleCheckItem}/>
       <Stats items={items}/>
     </div>
   );

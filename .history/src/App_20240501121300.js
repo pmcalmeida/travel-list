@@ -48,35 +48,21 @@ function Item({ item: { id, description, quantity, packed }, onDeleteItem, onChe
   </li>
 }
 
-function PackagingList({ items, onDeleteItem, onCheckItem, onClearList }) {
-  const [sortBy, setSortBy] = useState("input");
-
-  const sortedItems = items.slice().sort((a, b) => {
-    if (sortBy === "input") {
-      return a.id - b.id;
-    }
-    if (sortBy === "description") {
-      return a.description.localeCompare(b.description);
-    }
-    if (sortBy === "packed") {
-      return Number(b.packed) - Number(a.packed)
-    }
-    return 0;
-  });
-
+function PackagingList({ items, onDeleteItem, onCheckItem }) {
+  const [sortBy, setSortBy] = useState();
+  
   return (
     <div className="list">
       <ul>{
-        sortedItems.map(item => <Item key={item.id} item={item} onDeleteItem={onDeleteItem} onCheckItem={onCheckItem}/>)
+        items.map(item => <Item key={item.id} item={item} onDeleteItem={onDeleteItem} onCheckItem={onCheckItem}/>)
       }</ul>
       <div className="actions">
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+        <select>
           <option value="input">input</option>
           <option value="description">description</option>
           <option value="packed">packed</option>
         </select>
       </div>
-      <button onClick={onClearList}>Clear list</button>
     </div>
   )
 }
@@ -113,15 +99,11 @@ function App() {
     setItems(updatedItems);
   }
 
-  const handleDeleteList = () => {
-    setItems([]);
-  }
-
   return (
     <div className="app">
       <Logo />
       <Form onAddItems={handleAddItems}/>
-      <PackagingList items={items} onDeleteItem={handleDeleteItem} onCheckItem={handleCheckItem} onClearList={handleDeleteList}/>
+      <PackagingList items={items} onDeleteItem={handleDeleteItem} onCheckItem={handleCheckItem}/>
       <Stats items={items}/>
     </div>
   );

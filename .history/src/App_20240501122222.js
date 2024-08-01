@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './index.css';
 
 const initialItems = [
@@ -48,26 +48,30 @@ function Item({ item: { id, description, quantity, packed }, onDeleteItem, onChe
   </li>
 }
 
-function PackagingList({ items, onDeleteItem, onCheckItem, onClearList }) {
+function PackagingList({ items, onDeleteItem, onCheckItem, onSortItems }) {
   const [sortBy, setSortBy] = useState("input");
 
-  const sortedItems = items.slice().sort((a, b) => {
+  const sortedItems = items.sort((a, b) => {
     if (sortBy === "input") {
       return a.id - b.id;
     }
     if (sortBy === "description") {
-      return a.description.localeCompare(b.description);
+      return a.description - b.description;
     }
     if (sortBy === "packed") {
-      return Number(b.packed) - Number(a.packed)
+      return a.packed ? 1 : 0;
     }
     return 0;
   });
 
+  useEffect(() => {
+    onSortItems(sortedItems);
+  }, [onSortItems, sortedItems]);
+
   return (
     <div className="list">
       <ul>{
-        sortedItems.map(item => <Item key={item.id} item={item} onDeleteItem={onDeleteItem} onCheckItem={onCheckItem}/>)
+        items.map(item => <Item key={item.id} item={item} onDeleteItem={onDeleteItem} onCheckItem={onCheckItem}/>)
       }</ul>
       <div className="actions">
         <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
@@ -76,7 +80,6 @@ function PackagingList({ items, onDeleteItem, onCheckItem, onClearList }) {
           <option value="packed">packed</option>
         </select>
       </div>
-      <button onClick={onClearList}>Clear list</button>
     </div>
   )
 }
@@ -113,15 +116,15 @@ function App() {
     setItems(updatedItems);
   }
 
-  const handleDeleteList = () => {
-    setItems([]);
+  const handleSortItems = (sortedItems) => {
+    setItems(sortedItems);
   }
 
   return (
     <div className="app">
       <Logo />
       <Form onAddItems={handleAddItems}/>
-      <PackagingList items={items} onDeleteItem={handleDeleteItem} onCheckItem={handleCheckItem} onClearList={handleDeleteList}/>
+      <PackagingList items={items} onDeleteItem={handleDeleteItem} onCheckItem={handleCheckItem} onSortItems={handleSortItems}/>
       <Stats items={items}/>
     </div>
   );
